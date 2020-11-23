@@ -10,3 +10,8 @@ The problem considered here is facility location problem, where we have n number
 Objective Function
 
 Minimize f(x1,x2,....,x2m) = Σi wi minj(d(ti,bj))
+
+Main file : OptimizationAlgoCompare.py
+
+	
+
