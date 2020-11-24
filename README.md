@@ -1,4 +1,4 @@
-# Optimization-Algo-
+# Optimization-Algo-Comparision
 Different optimization algorithms like Hill climbing, Simulated annealing,  Late accepted Hill climbing , Genetic Algorithm is implemented from scratch.
 
 For algorithms like Covariance Matrix adaptation and Particle Swarm Algorithm external python libraries are used.
