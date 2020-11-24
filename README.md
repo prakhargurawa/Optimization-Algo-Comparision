@@ -13,5 +13,7 @@ Minimize f(x1,x2,....,x2m) = Σi wi minj(d(ti,bj))
 
 Main file : OptimizationAlgoCompare.py
 
+Report : OptimizationAlgoComparision.pdf
+
 	
 
