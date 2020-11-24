@@ -76,11 +76,14 @@ def facility_run_Hill_Climbing(its=10000,plot=False):
 X = facility_run_Hill_Climbing()
 facility_location(X[0])
 """
+# For plotting purpose
+# X = facility_run_Hill_Climbing(its=2000,plot=True)
+
 seedList = [i for i in range(5)]
 fvalues=[]
 for s in seedList:
     random.seed(s)
-    x,fbest = facility_run_Hill_Climbing(its=10000)
+    x,fbest = facility_run_Hill_Climbing(its=50000)
     fvalues.append(fbest)
 
 fvalues = np.array(fvalues)   
@@ -103,7 +106,8 @@ def facility_run_Simulated_Annealing(T=1,alpha=0.999,maxints=5000,plot=False):
     if(plot):
         plt.plot(history[:, 0], history[:, 1])
         plt.xlabel("Iteration"); plt.ylabel("Objective")
-        plt.title("Simulated Annealing")
+        titleStr = "Simulated Annealing T = "+str(T)+" alpha = "+str(alpha)
+        plt.title(titleStr)
         plt.show()
     return bestx,bestfx    
 
@@ -112,14 +116,17 @@ def facility_run_Simulated_Annealing(T=1,alpha=0.999,maxints=5000,plot=False):
 X = facility_run_Simulated_Annealing()
 facility_location(X)
 """
+# For plotting purpose
+# X = facility_run_Simulated_Annealing(T=1,alpha=0.5,maxints=2000,plot=True)
+
 Tvalues = [1,2]
-alphaValues = [0.5,0.8,0.9]
+alphaValues = [0.5,0.9]
 for temp,alpha in itertools.product(Tvalues,alphaValues):
     seedList = [i for i in range(5)]
     fvalues=[]
     for s in seedList:
         random.seed(s)
-        x,fbest = facility_run_Simulated_Annealing(T=temp,alpha=alpha)
+        x,fbest = facility_run_Simulated_Annealing(T=temp,alpha=alpha,maxints=50000)
         fvalues.append(fbest)
 
     fvalues = np.array(fvalues)   
@@ -137,7 +144,8 @@ def facility_run_LAHC(L=10,maxiter=10000,plot=False):
     if(plot):
         plt.plot(history[:, 0], history[:, 1])
         plt.xlabel("Iteration"); plt.ylabel("Objective")
-        plt.title("Late Accepted Hill Climbing")
+        titleStr = "LAHC L = "+str(L)
+        plt.title(titleStr)
         plt.show()
     return best,Cbest
 
@@ -145,13 +153,16 @@ def facility_run_LAHC(L=10,maxiter=10000,plot=False):
 # Single Run for testing 
 bestx,bestfx = facility_run_LAHC(L=2) 
 """
+# For plotting purpose
+# X = facility_run_LAHC(L=10,maxiter=3000,plot=True)
+
 Lvalues = [2,10,20]
 for L in Lvalues:
     seedList = [i for i in range(5)]
     fvalues=[]
     for s in seedList:
         random.seed(s)
-        x,fbest = facility_run_LAHC(L=L)
+        x,fbest = facility_run_LAHC(L=L,maxiter=50000)
         fvalues.append(fbest)
         
     fvalues = np.array(fvalues)   
@@ -178,14 +189,15 @@ def facility_run_Genetic_Algorithm(popsize = 100,ngens = 100,pmut = 0.1,tsize = 
     if(plot):
         plt.plot(h[:, 1], h[:, 2])
         plt.xlabel("Iterations");plt.ylabel("Fitness")
-        plt.title("Genetic Algorithm")
+        titleStr = "Genetic Algo P = "+str(popsize)+" G = "+str(ngens)+" M = "+str(pmut)+" T = "+str(tsize)
+        plt.title(titleStr)
         plt.show()
         plt.close()
     
         # plot std fit against number of individuals 
         plt.plot(h[:, 1], h[:, -1])
         plt.xlabel("Iterations");plt.ylabel("Standard deviation (fitness)")
-        plt.title("Genetic Algorithm")
+        plt.title(titleStr)
         plt.show()
     return best,bestf
 
@@ -194,14 +206,18 @@ def facility_run_Genetic_Algorithm(popsize = 100,ngens = 100,pmut = 0.1,tsize = 
 X = facility_run_Genetic_Algorithm(popsize = 100,ngens = 100,pmut = 0.1,tsize = 2)
 facility_location(X[0])
 """
+# For plotting purpose
+# X = facility_run_Genetic_Algorithm(popsize = 200,ngens = 250,pmut = 0.2,tsize = 2,plot=True)
+
 populationSize = [100,200]
-nGenerations = [100,200]
 mutationRatio = [0.1,0.2]
 tournamentSize = [2]
 
-for pop,gen,pmut,tsize in itertools.product(populationSize,nGenerations,mutationRatio,tournamentSize):
+for pop,pmut,tsize in itertools.product(populationSize,mutationRatio,tournamentSize):
     seedList = [i for i in range(5)]
     fvalues=[]
+    # considering a fitness evaluation budget of 50000 budget = populationSize*noOfGeneration
+    gen = int(50000/pop)
     for s in seedList:
         random.seed(s)
         x,fbest = facility_run_Genetic_Algorithm(popsize = pop,ngens = gen,pmut = pmut,tsize = tsize)
@@ -232,7 +248,8 @@ def facility_run_CMA(popsize=100):
     es=cma.CMAEvolutionStrategy(mu,1,
                                 {'bounds': [-np.inf, np.inf],
                                  'seed':234,
-                                 'popsize':popsize})
+                                 'popsize':popsize,
+                                 'maxiter':1000})
     es.optimize(f)    
     xbest, fbest, evals_best, evaluations, iterations, xfavorite, stds, stop = es.result
     return xbest,fbest
@@ -264,7 +281,7 @@ for pop in populationSize:
 # PSO from scratch : https://medium.com/analytics-vidhya/implementing-particle-swarm-optimization-pso-algorithm-in-python-9efc2eb179a6
 # DEFINE COST FUNCTIONS
 
-def facility_run_PSO(maxiter=100,omega=0.5,phip =0.5,phig =0.5):
+def facility_run_PSO(maxiter=1000,omega=0.5,phip =0.5,phig =0.5):
     # Reference : https://pythonhosted.org/pyswarm/ (PySwarm Library for Python's PMO Implementation)
     
     # maxiter : The maximum number of iterations for the swarm to search (Default: 100)
@@ -274,7 +291,7 @@ def facility_run_PSO(maxiter=100,omega=0.5,phip =0.5,phig =0.5):
     n = 12
     lb = [0 for i in range(n)] # To be in range of farm (lower bound)
     ub = [8 for i in range(n)] # To be in range of farm (upper bound)
-    xoft,fopt=pso(facility_location,lb,ub)
+    xoft,fopt=pso(facility_location,lb,ub,maxiter=maxiter)
     #xoft,fopt= pso(facility_location,lb,ub,omega=omega,phip=phip,phig=phig,maxiter=maxiter)
     return xoft,fopt
 
