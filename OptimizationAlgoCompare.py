@@ -13,9 +13,11 @@ from HillClimbing import HC
 from SimulatedAnnealing import SA
 from LateAcceptedHillClimbing import LAHC
 from GeneticAlgorithm import GA,tournament_select,uniform_crossover,real_gaussian_init,real_gaussian_nbr
+from RandomSearch import RS
 import cma
 from pyswarm import pso
 import itertools
+from BestNeighbours import BestNeighborsAlgo
 
 
 # IMPORTING DATASET (Location of trees and amount of fruits on them)
@@ -55,9 +57,39 @@ def real_nbr(x):
     x[i] = x[i] + (2 * delta * np.random.random() - delta)
     return x
 
-################################################################
-#  UTILITY FUNCTION FOR HILL CLIMBING FUNCTION (RANDOM SEARCH) #
-################################################################
+######################################
+# UTILITY FUNCTION FOR RANDOM SEARCH #
+######################################
+def facility_run_RandomSearch(its=10000,plot=False):
+    n = 12
+    f = lambda x: facility_location(x) 
+    stop = lambda i, fx: abs(fx) < 0.00001
+    x,history = RS(f, lambda: real_init(n), real_nbr, its, stop=stop)
+    if(plot):
+        plt.plot(history[:, 0], history[:, 1])
+        plt.xlabel("Iteration"); plt.ylabel("Objective")
+        plt.title("Random seacrh")
+        plt.show()
+    fbest = facility_location(x)
+    return x,fbest
+
+# For Plotting purpose    
+# X = facility_run_RandomSearch(its=50000,plot=True)
+seedList = [i for i in range(5)]
+fvalues=[]
+for s in seedList:
+    random.seed(s)
+    x,fbest = facility_run_RandomSearch(its=50000)
+    fvalues.append(fbest)
+    
+fvalues = np.array(fvalues)   
+print("The objective function values for Random search are : ",fvalues)
+print("The mean objective function value for Random search is : ",np.mean(fvalues))
+print("The standard deviation for objective function for Random search is : ",np.std(fvalues))
+
+################################################
+#  UTILITY FUNCTION FOR HILL CLIMBING FUNCTION #
+################################################
 def facility_run_Hill_Climbing(its=10000,plot=False):
     n = 12
     f = lambda x: facility_location(x) 
@@ -319,3 +351,26 @@ for w,p,g in itertools.product(W,cp,cg):
     print(f"The standard deviation for objective function for PSO ( w = {w} , cp ={p} , cg ={g} ) is : ",np.std(fvalues))
 
 
+#################################################################################
+# UTILITY FUNCTION FOR BEST NEIGHBOUR ALGORITHM  - TRIED CREATING NEW ALGORITHM #
+#################################################################################
+# Algorithm is implemented in  BestNeighbours.py   
+def facility_run_Best_Neighbors_Algo(its=50,c_hyperparam=3):
+    n = 12
+    f = lambda x: facility_location(x) 
+    fbest = BestNeighborsAlgo(f, lambda: real_init(n), its,c=c_hyperparam) # Set hyperparameter c as 3 (was giving good results)
+    return fbest
+
+
+for c_h in [3,4,5,6]:
+    seedList = [i for i in range(5)]
+    fvalues=[]
+    for s in seedList:
+        random.seed(s)
+        fbest =  facility_run_Best_Neighbors_Algo(its=50,c_hyperparam=c_h)
+        fvalues.append(fbest)
+    
+    fvalues = np.array(fvalues)   
+    print(f"\n\nThe objective function values for Best Neighbours algo  ( c = {c_h} )  are : ",fvalues)
+    print(f"The mean objective function value for Best Neighbours algo  ( c = {c_h} ) is : ",np.mean(fvalues))
+    print(f"The standard deviation for objective function for Best Neighbours algo  ( c = {c_h} ) is : ",np.std(fvalues))
